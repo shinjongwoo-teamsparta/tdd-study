@@ -2,11 +2,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"pnpm run dev:next\" \"pnpm run api\"",
-    "dev:next": "next dev",
+    "start": "concurrently \"next start\" \"pnpm run api\"",
+    "dev": "concurrently \"next dev\" \"pnpm run api\"",
     "api": "json-server --watch public/db.json --port 8080",
     "build": "next build",
-    "start": "concurrently \"pnpm run start:next\" \"pnpm run start:api\"",
     "test": "vitest",
     "type-check": "tsc --noEmit"
   },
