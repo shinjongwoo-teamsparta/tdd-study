@@ -277,12 +277,6 @@ describe("질문글 상세 페이지", () => {
       mockDeleteQuestion.mockResolvedValue({ success: true });
       
       const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
-      const mockPush = vi.fn();
-      
-      // useRouter mock
-      vi.mock("next/navigation", () => ({
-        useRouter: () => ({ push: mockPush }),
-      }));
 
       render(<QuestionDetailPage params={{ id: "1" }} />);
 
@@ -295,7 +289,7 @@ describe("질문글 상세 페이지", () => {
 
       await waitFor(() => {
         expect(mockDeleteQuestion).toHaveBeenCalledWith("1");
-        expect(mockPush).toHaveBeenCalledWith("/questions");
+        expect((global as any).mockPush).toHaveBeenCalledWith("/questions");
       });
       
       confirmSpy.mockRestore();

@@ -238,12 +238,6 @@ describe("질문글 작성 페이지", () => {
         visibility: "전체 공개",
       };
       mockCreateQuestion.mockResolvedValue(createdQuestion);
-      const mockPush = vi.fn();
-
-      // useRouter mock
-      vi.mock("next/navigation", () => ({
-        useRouter: () => ({ push: mockPush }),
-      }));
 
       render(<QuestionNewPage />);
 
@@ -261,7 +255,7 @@ describe("질문글 작성 페이지", () => {
       await user.click(submitButton);
 
       await waitFor(() => {
-        expect(mockPush).toHaveBeenCalledWith("/questions/new-id");
+        expect((global as any).mockPush).toHaveBeenCalledWith("/questions/new-id");
       });
     });
   });
@@ -295,19 +289,13 @@ describe("질문글 작성 페이지", () => {
   describe("취소 버튼", () => {
     it("취소 버튼을 클릭하면 목록 페이지로 이동해야 한다", async () => {
       const user = userEvent.setup();
-      const mockPush = vi.fn();
-
-      // useRouter mock
-      vi.mock("next/navigation", () => ({
-        useRouter: () => ({ push: mockPush }),
-      }));
 
       render(<QuestionNewPage />);
 
       const cancelButton = screen.getByRole("button", { name: "취소" });
       await user.click(cancelButton);
 
-      expect(mockPush).toHaveBeenCalledWith("/questions");
+      expect((global as any).mockPush).toHaveBeenCalledWith("/questions");
     });
   });
 

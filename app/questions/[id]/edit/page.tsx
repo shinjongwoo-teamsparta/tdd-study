@@ -3,11 +3,22 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
+type Question = {
+  id: string;
+  title: string;
+  content: string;
+  category: string;
+  visibility: string;
+  isResolved: boolean;
+  authorId: string;
+};
+
 type FormData = {
   title: string;
   content: string;
   category: string;
   visibility: string;
+  isResolved: boolean;
 };
 
 type FormErrors = {
@@ -17,40 +28,65 @@ type FormErrors = {
   visibility?: string;
 };
 
-export default function QuestionNewPage() {
+type QuestionEditPageProps = {
+  params: { id: string };
+};
+
+export default function QuestionEditPage({ params }: QuestionEditPageProps) {
   const router = useRouter();
+  const [question, setQuestion] = useState<Question | null>(null);
   const [formData, setFormData] = useState<FormData>({
     title: "",
     content: "",
     category: "",
     visibility: "",
+    isResolved: false,
   });
+  const [currentUser, setCurrentUser] = useState<{ id: string; name: string } | null>(null);
   const [errors, setErrors] = useState<FormErrors>({});
+  const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
-  const [showDraftMessage, setShowDraftMessage] = useState(false);
+  const [hasPermission, setHasPermission] = useState(true);
 
   useEffect(() => {
-    // 임시 저장된 데이터 확인
-    const draft = localStorage.getItem("question-draft");
-    if (draft) {
-      setShowDraftMessage(true);
-    }
-  }, []);
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+        const { fetchQuestion, getCurrentUser } = await import("./api");
+        const [questionData, userData] = await Promise.all([
+          fetchQuestion(params.id),
+          getCurrentUser(),
+        ]);
 
-  const handleLoadDraft = () => {
-    const draft = localStorage.getItem("question-draft");
-    if (draft) {
-      const parsedDraft = JSON.parse(draft);
-      setFormData(parsedDraft);
-      setShowDraftMessage(false);
-    }
-  };
+        setQuestion(questionData);
+        setCurrentUser(userData);
 
-  const handleTempSave = () => {
-    localStorage.setItem("question-draft", JSON.stringify(formData));
-  };
+        // 권한 확인
+        if (userData.id !== questionData.authorId) {
+          setHasPermission(false);
+        } else {
+          setFormData({
+            title: questionData.title,
+            content: questionData.content,
+            category: questionData.category,
+            visibility: questionData.visibility,
+            isResolved: questionData.isResolved,
+          });
+        }
+
+        setError(null);
+      } catch (err) {
+        setError("질문을 불러오지 못했습니다. 다시 시도해주세요.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, [params.id]);
 
   const validateField = (name: string, value: string) => {
     const newErrors = { ...errors };
@@ -83,11 +119,16 @@ export default function QuestionNewPage() {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    
+    if (name === "isResolved") {
+      setFormData({ ...formData, isResolved: value === "true" });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleCancel = () => {
-    router.push("/questions");
+    router.push(`/questions/${params.id}`);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -107,14 +148,6 @@ export default function QuestionNewPage() {
       newErrors.content = "내용은 10자 이상 2000자 이하로 입력해주세요.";
     }
 
-    if (!formData.category) {
-      newErrors.category = "카테고리를 선택해주세요.";
-    }
-
-    if (!formData.visibility) {
-      newErrors.visibility = "공개 범위를 선택해주세요.";
-    }
-
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
@@ -124,29 +157,34 @@ export default function QuestionNewPage() {
       setIsSubmitting(true);
       setSubmitError(null);
 
-      const { createQuestion } = await import("./api");
-      const createdQuestion = await createQuestion(formData);
+      const { updateQuestion } = await import("./api");
+      await updateQuestion(params.id, formData);
 
-      setSubmitSuccess("등록이 완료되었습니다.");
+      setSubmitSuccess("수정이 완료되었습니다.");
 
       // 성공 후 상세 페이지로 이동
-      router.push(`/questions/${createdQuestion.id}`);
+      router.push(`/questions/${params.id}`);
     } catch (err) {
-      setSubmitError("등록에 실패했습니다. 다시 시도해주세요.");
+      setSubmitError("수정에 실패했습니다. 다시 시도해주세요.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  if (isLoading) {
+    return <div>로딩 중...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+  if (!hasPermission) {
+    return <div>수정 권한이 없습니다.</div>;
+  }
+
   return (
     <div>
-      {showDraftMessage && (
-        <div>
-          <div>이전에 작성 중이던 내용이 있습니다. 불러오시겠습니까?</div>
-          <button onClick={handleLoadDraft}>불러오기</button>
-        </div>
-      )}
-
       <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="title">제목</label>
@@ -206,21 +244,32 @@ export default function QuestionNewPage() {
           {errors.visibility && <div>{errors.visibility}</div>}
         </div>
 
+        <div>
+          <label htmlFor="isResolved">해결 여부</label>
+          <select
+            id="isResolved"
+            name="isResolved"
+            value={formData.isResolved.toString()}
+            onChange={handleChange}
+          >
+            <option value="false">미해결</option>
+            <option value="true">해결됨</option>
+          </select>
+        </div>
+
         {submitError && <div>{submitError}</div>}
         {submitSuccess && <div>{submitSuccess}</div>}
-        {isSubmitting && <div>등록 중...</div>}
+        {isSubmitting && <div>수정 중...</div>}
 
         <button type="submit" disabled={isSubmitting}>
-          등록하기
+          수정 완료
         </button>
         <button type="button" onClick={handleCancel}>
           취소
-        </button>
-        <button type="button" onClick={handleTempSave}>
-          임시 저장
         </button>
       </form>
     </div>
   );
 }
+
 

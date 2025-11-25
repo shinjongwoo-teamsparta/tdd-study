@@ -50,6 +50,25 @@ export function validateContent(content: string): ValidationResult {
 }
 
 /**
+ * 한국어 조사 선택 함수
+ * @param word - 단어
+ * @returns "을" 또는 "를"
+ */
+function getJosa(word: string): string {
+  const lastChar = word.charAt(word.length - 1);
+  const charCode = lastChar.charCodeAt(0);
+  
+  // 한글 범위: 0xAC00 ~ 0xD7A3
+  if (charCode >= 0xAC00 && charCode <= 0xD7A3) {
+    // 받침이 있으면 "을", 없으면 "를"
+    return (charCode - 0xAC00) % 28 === 0 ? "를" : "을";
+  }
+  
+  // 한글이 아닌 경우 기본값 "을"
+  return "을";
+}
+
+/**
  * 필수 입력 검증
  * @param value - 검증할 값
  * @param fieldName - 필드 이름
@@ -60,9 +79,10 @@ export function validateRequired(
   fieldName: string
 ): ValidationResult {
   if (!value || value.trim() === "") {
+    const josa = getJosa(fieldName);
     return {
       isValid: false,
-      error: `${fieldName}를 선택해주세요.`,
+      error: `${fieldName}${josa} 선택해주세요.`,
     };
   }
 

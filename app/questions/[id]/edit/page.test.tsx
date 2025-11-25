@@ -328,12 +328,6 @@ describe("질문글 수정 페이지", () => {
       const user = userEvent.setup();
       mockFetchQuestion.mockResolvedValue(mockQuestion);
       mockUpdateQuestion.mockResolvedValue(mockQuestion);
-      const mockPush = vi.fn();
-
-      // useRouter mock
-      vi.mock("next/navigation", () => ({
-        useRouter: () => ({ push: mockPush }),
-      }));
 
       render(<QuestionEditPage params={{ id: "1" }} />);
 
@@ -345,7 +339,7 @@ describe("질문글 수정 페이지", () => {
       await user.click(submitButton);
 
       await waitFor(() => {
-        expect(mockPush).toHaveBeenCalledWith("/questions/1");
+        expect((global as any).mockPush).toHaveBeenCalledWith("/questions/1");
       });
     });
   });
@@ -375,12 +369,6 @@ describe("질문글 수정 페이지", () => {
     it("취소 버튼을 클릭하면 상세 페이지로 이동해야 한다", async () => {
       const user = userEvent.setup();
       mockFetchQuestion.mockResolvedValue(mockQuestion);
-      const mockPush = vi.fn();
-
-      // useRouter mock
-      vi.mock("next/navigation", () => ({
-        useRouter: () => ({ push: mockPush }),
-      }));
 
       render(<QuestionEditPage params={{ id: "1" }} />);
 
@@ -391,7 +379,7 @@ describe("질문글 수정 페이지", () => {
       const cancelButton = screen.getByRole("button", { name: "취소" });
       await user.click(cancelButton);
 
-      expect(mockPush).toHaveBeenCalledWith("/questions/1");
+      expect((global as any).mockPush).toHaveBeenCalledWith("/questions/1");
     });
   });
 
