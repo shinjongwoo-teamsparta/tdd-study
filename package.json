@@ -2,13 +2,17 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev",
+    "dev": "concurrently \"pnpm run dev:next\" \"pnpm run api\"",
+    "dev:next": "next dev",
+    "api": "json-server --watch public/db.json --port 8080",
     "build": "next build",
-    "start": "next start",
+    "start": "concurrently \"pnpm run start:next\" \"pnpm run start:api\"",
     "test": "vitest",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "concurrently": "^9.2.1",
+    "json-server": "1.0.0-beta.3",
     "next": "latest",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

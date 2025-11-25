@@ -1,0 +1,132 @@
+{
+  "questions": [
+    {
+      "id": "1",
+      "title": "React Hook Form 사용 방법",
+      "content": "React Hook Form을 처음 사용하는데, 기본적인 사용 방법을 알려주세요.",
+      "category": "React",
+      "author": "홍길동",
+      "authorId": "user-1",
+      "createdAt": "2025-11-20T10:00:00.000Z",
+      "likeCount": 5,
+      "isResolved": false,
+      "visibility": "전체 공개"
+    },
+    {
+      "id": "2",
+      "title": "Next.js 13 App Router 질문",
+      "content": "App Router에서 데이터 페칭은 어떻게 하나요?",
+      "category": "Next.js",
+      "author": "김철수",
+      "authorId": "user-2",
+      "createdAt": "2025-11-21T14:30:00.000Z",
+      "likeCount": 3,
+      "isResolved": true,
+      "visibility": "전체 공개"
+    },
+    {
+      "id": "c272",
+      "title": "ㅎㅎㅎㅎ",
+      "content": "lorem ipsum",
+      "category": "JavaScript",
+      "visibility": "전체 공개",
+      "createdAt": "2025-11-25T03:53:37.221Z",
+      "likeCount": 0,
+      "isResolved": false
+    },
+    {
+      "id": "5eb1",
+      "title": "ㅎㅎㅎ",
+      "content": "ㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁ",
+      "category": "테스트",
+      "visibility": "비공개",
+      "createdAt": "2025-11-25T03:55:23.099Z",
+      "likeCount": 0,
+      "isResolved": false
+    },
+    {
+      "id": "1098",
+      "title": "ㅁㅁㅁㅁ",
+      "content": "ㅣㄱ대ㅡㅁㄴㅇㄹㅣㄱ대ㅡㅁㄴㅇㄹㅣㄱ대ㅡㅁㄴㅇㄹ",
+      "category": "React",
+      "visibility": "비공개",
+      "createdAt": "2025-11-25T03:56:01.555Z",
+      "likeCount": 0,
+      "isResolved": false
+    }
+  ],
+  "comments": [
+    {
+      "id": "1",
+      "questionId": "1",
+      "content": "공식 문서를 참고하시면 좋을 것 같습니다!",
+      "author": "이영희",
+      "authorId": "user-3",
+      "createdAt": "2025-11-20T11:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "questionId": "1",
+      "content": "useForm 훅부터 시작해보세요.",
+      "author": "박민수",
+      "authorId": "user-4",
+      "createdAt": "2025-11-20T12:00:00.000Z"
+    },
+    {
+      "id": "3",
+      "questionId": "2",
+      "content": "Server Component에서 직접 fetch를 사용하면 됩니다.",
+      "author": "정수진",
+      "authorId": "user-5",
+      "createdAt": "2025-11-21T15:00:00.000Z"
+    }
+  ],
+  "users": [
+    {
+      "id": "user-1",
+      "name": "홍길동"
+    },
+    {
+      "id": "user-2",
+      "name": "김철수"
+    },
+    {
+      "id": "user-3",
+      "name": "이영희"
+    },
+    {
+      "id": "user-4",
+      "name": "박민수"
+    },
+    {
+      "id": "user-5",
+      "name": "정수진"
+    },
+    {
+      "id": "current-user-id",
+      "name": "Current User"
+    }
+  ],
+  "likes": [
+    {
+      "id": "1",
+      "questionId": "1",
+      "userId": "user-3"
+    },
+    {
+      "id": "2",
+      "questionId": "1",
+      "userId": "user-4"
+    },
+    {
+      "id": "3",
+      "questionId": "1",
+      "userId": "user-5"
+    },
+    {
+      "id": "4",
+      "questionId": "2",
+      "userId": "user-1"
+    }
+  ]
+}
