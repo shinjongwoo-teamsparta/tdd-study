@@ -1,6 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { MessageCircle, Send, Trash2, AlertCircle } from "lucide-react";
 
 type Comment = {
   id: string;
@@ -90,60 +96,107 @@ export function CommentSection({ questionId }: CommentSectionProps) {
   };
 
   if (isLoading) {
-    return <div>로딩 중...</div>;
+    return (
+      <div className="flex items-center justify-center py-8">
+        <div className="text-sm text-muted-foreground">로딩 중...</div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div>{error}</div>;
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>{error}</AlertDescription>
+      </Alert>
+    );
   }
 
   const isCommentValid = newCommentContent.trim().length > 0;
 
   return (
-    <div>
-      <h3>댓글 {comments.length}개</h3>
-      
-      {comments.length === 0 ? (
-        <div>아직 댓글이 없습니다.</div>
-      ) : (
-        <div>
-          {comments.map((comment) => (
-            <div key={comment.id} data-testid={`comment-${comment.id}`}>
-              <div>{comment.content}</div>
-              <div>{comment.author}</div>
-              <div>{comment.createdAt}</div>
-              {currentUser && currentUser.id === comment.authorId && (
-                <button onClick={() => handleDelete(comment.id)}>삭제</button>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <MessageCircle className="h-5 w-5" />
+          댓글 {comments.length}개
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {comments.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            아직 댓글이 없습니다.
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {comments.map((comment) => (
+              <div 
+                key={comment.id} 
+                data-testid={`comment-${comment.id}`}
+                className="p-4 rounded-lg border bg-card"
+              >
+                <p className="mb-3">{comment.content}</p>
+                <div className="flex items-center justify-between">
+                  <div className="text-sm text-muted-foreground">
+                    {comment.author} · {comment.createdAt}
+                  </div>
+                  {currentUser && currentUser.id === comment.authorId && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => handleDelete(comment.id)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4 mr-1" />
+                      삭제
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="comment-input">댓글 입력</label>
-          <textarea
-            id="comment-input"
-            value={newCommentContent}
-            onChange={(e) => {
-              setNewCommentContent(e.target.value);
-              setValidationError(null);
-            }}
-          />
-        </div>
-        
-        {validationError && <div>{validationError}</div>}
-        {submitError && <div>{submitError}</div>}
-        
-        <button
-          type="submit"
-          disabled={!isCommentValid || isSubmitting}
-        >
-          댓글 등록
-        </button>
-      </form>
-    </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="comment-input">댓글 입력</Label>
+            <Textarea
+              id="comment-input"
+              placeholder="댓글을 입력하세요..."
+              value={newCommentContent}
+              onChange={(e) => {
+                setNewCommentContent(e.target.value);
+                setValidationError(null);
+              }}
+              className={validationError ? "border-destructive" : ""}
+            />
+          </div>
+          
+          {validationError && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{validationError}</AlertDescription>
+            </Alert>
+          )}
+          
+          {submitError && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{submitError}</AlertDescription>
+            </Alert>
+          )}
+          
+          <Button
+            type="submit"
+            disabled={!isCommentValid || isSubmitting}
+            className="w-full"
+          >
+            <Send className="mr-2 h-4 w-4" />
+            댓글 등록
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 }
 

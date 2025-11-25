@@ -2,6 +2,26 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle 
+} from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Save, Send, X, AlertCircle, CheckCircle2 } from "lucide-react";
 
 type FormData = {
   title: string;
@@ -139,87 +159,177 @@ export default function QuestionNewPage() {
   };
 
   return (
-    <div>
+    <div className="container mx-auto py-8 px-4 max-w-3xl">
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold mb-2">질문 작성하기</h1>
+        <p className="text-muted-foreground">
+          궁금한 점을 자세히 작성해주세요
+        </p>
+      </div>
+
       {showDraftMessage && (
-        <div>
-          <div>이전에 작성 중이던 내용이 있습니다. 불러오시겠습니까?</div>
-          <button onClick={handleLoadDraft}>불러오기</button>
-        </div>
+        <Alert className="mb-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription className="flex items-center justify-between">
+            <span>이전에 작성 중이던 내용이 있습니다. 불러오시겠습니까?</span>
+            <Button 
+              onClick={handleLoadDraft} 
+              variant="outline" 
+              size="sm"
+              className="ml-4"
+            >
+              불러오기
+            </Button>
+          </AlertDescription>
+        </Alert>
       )}
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="title">제목</label>
-          <input
-            id="title"
-            name="title"
-            type="text"
-            value={formData.title}
-            onChange={handleChange}
-            onBlur={handleBlur}
-          />
-          {errors.title && <div>{errors.title}</div>}
-        </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>질문 정보</CardTitle>
+          <CardDescription>
+            질문에 대한 정보를 입력해주세요
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="title">제목<span className="text-destructive ml-1">*</span></Label>
+              <Input
+                id="title"
+                name="title"
+                type="text"
+                placeholder="질문 제목을 입력하세요 (2-50자)"
+                value={formData.title}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className={errors.title ? "border-destructive" : ""}
+              />
+              {errors.title && (
+                <p className="text-sm text-destructive">{errors.title}</p>
+              )}
+            </div>
 
-        <div>
-          <label htmlFor="content">내용</label>
-          <textarea
-            id="content"
-            name="content"
-            value={formData.content}
-            onChange={handleChange}
-            onBlur={handleBlur}
-          />
-          {errors.content && <div>{errors.content}</div>}
-        </div>
+            <div className="space-y-2">
+              <Label htmlFor="content">내용<span className="text-destructive ml-1">*</span></Label>
+              <Textarea
+                id="content"
+                name="content"
+                placeholder="질문 내용을 상세히 입력하세요 (10-2000자)"
+                value={formData.content}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className={errors.content ? "border-destructive min-h-[200px]" : "min-h-[200px]"}
+              />
+              {errors.content && (
+                <p className="text-sm text-destructive">{errors.content}</p>
+              )}
+            </div>
 
-        <div>
-          <label htmlFor="category">카테고리</label>
-          <select
-            id="category"
-            name="category"
-            value={formData.category}
-            onChange={handleChange}
-          >
-            <option value="">선택하세요</option>
-            <option value="JavaScript">JavaScript</option>
-            <option value="React">React</option>
-            <option value="테스트">테스트</option>
-            <option value="기타">기타</option>
-          </select>
-          {errors.category && <div>{errors.category}</div>}
-        </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="category">카테고리<span className="text-destructive ml-1">*</span></Label>
+                <Select
+                  name="category"
+                  value={formData.category}
+                  onValueChange={(value) => 
+                    setFormData({ ...formData, category: value })
+                  }
+                >
+                  <SelectTrigger 
+                    id="category"
+                    className={errors.category ? "border-destructive" : ""}
+                  >
+                    <SelectValue placeholder="선택하세요" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="JavaScript">JavaScript</SelectItem>
+                    <SelectItem value="React">React</SelectItem>
+                    <SelectItem value="테스트">테스트</SelectItem>
+                    <SelectItem value="기타">기타</SelectItem>
+                  </SelectContent>
+                </Select>
+                {errors.category && (
+                  <p className="text-sm text-destructive">{errors.category}</p>
+                )}
+              </div>
 
-        <div>
-          <label htmlFor="visibility">공개 범위</label>
-          <select
-            id="visibility"
-            name="visibility"
-            value={formData.visibility}
-            onChange={handleChange}
-          >
-            <option value="">선택하세요</option>
-            <option value="전체 공개">전체 공개</option>
-            <option value="팀원만">팀원만</option>
-            <option value="비공개">비공개</option>
-          </select>
-          {errors.visibility && <div>{errors.visibility}</div>}
-        </div>
+              <div className="space-y-2">
+                <Label htmlFor="visibility">공개 범위<span className="text-destructive ml-1">*</span></Label>
+                <Select
+                  name="visibility"
+                  value={formData.visibility}
+                  onValueChange={(value) => 
+                    setFormData({ ...formData, visibility: value })
+                  }
+                >
+                  <SelectTrigger 
+                    id="visibility"
+                    className={errors.visibility ? "border-destructive" : ""}
+                  >
+                    <SelectValue placeholder="선택하세요" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="전체 공개">전체 공개</SelectItem>
+                    <SelectItem value="팀원만">팀원만</SelectItem>
+                    <SelectItem value="비공개">비공개</SelectItem>
+                  </SelectContent>
+                </Select>
+                {errors.visibility && (
+                  <p className="text-sm text-destructive">{errors.visibility}</p>
+                )}
+              </div>
+            </div>
 
-        {submitError && <div>{submitError}</div>}
-        {submitSuccess && <div>{submitSuccess}</div>}
-        {isSubmitting && <div>등록 중...</div>}
+            {submitError && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{submitError}</AlertDescription>
+              </Alert>
+            )}
 
-        <button type="submit" disabled={isSubmitting}>
-          등록하기
-        </button>
-        <button type="button" onClick={handleCancel}>
-          취소
-        </button>
-        <button type="button" onClick={handleTempSave}>
-          임시 저장
-        </button>
-      </form>
+            {submitSuccess && (
+              <Alert variant="success">
+                <CheckCircle2 className="h-4 w-4" />
+                <AlertDescription>{submitSuccess}</AlertDescription>
+              </Alert>
+            )}
+
+            {isSubmitting && (
+              <Alert>
+                <AlertDescription>등록 중...</AlertDescription>
+              </Alert>
+            )}
+
+            <div className="flex gap-3 pt-4">
+              <Button 
+                type="submit" 
+                disabled={isSubmitting}
+                className="flex-1"
+              >
+                <Send className="mr-2 h-4 w-4" />
+                등록하기
+              </Button>
+              <Button 
+                type="button" 
+                variant="outline"
+                onClick={handleTempSave}
+              >
+                <Save className="mr-2 h-4 w-4" />
+                임시 저장
+              </Button>
+              <Button 
+                type="button" 
+                variant="outline"
+                onClick={handleCancel}
+              >
+                <X className="mr-2 h-4 w-4" />
+                취소
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 }
